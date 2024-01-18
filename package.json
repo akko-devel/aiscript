@@ -1,0 +1,69 @@
+{
+  "name": "@akkohq/aiscript",
+  "version": "14.0.0",
+  "type": "module",
+  "packageManager": "yarn@4.0.2",
+  "description": "An implementation of AiScript",
+  "author": {
+    "email": "her@mint.lgbt",
+    "name": "Luna Nova",
+    "url": "https://woem.men/@luna"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/akko-devel/aiscript.git"
+  },
+  "exports": {
+    ".": {
+      "import": "./built/esm/index.js",
+      "types": "./built/dts/index.d.ts"
+    },
+    "./*": {
+      "import": "./built/esm/*",
+      "types": "./built/dts/*"
+    }
+  },
+  "scripts": {
+    "api": "api-extractor run --local --verbose",
+    "api:prod": "api-extractor run --verbose",
+    "build": "yarn peg && yarn ts",
+    "build:debug": "yarn peg:debug && tsc",
+    "lint": "eslint --ext .js,.jsx,.ts,.tsx ./src/**/*",
+    "parse": "node ./parse.js",
+    "peg": "peggy --allowed-start-rules Preprocess,Main --cache --format es -o ./src/parser/parser.js ./src/parser/parser.peggy && yarn peg:copy",
+    "peg:copy": "copyfiles -f ./src/parser/parser.js ./built/parser",
+    "peg:debug": "peggy --allowed-start-rules Preprocess,Main --cache --format es -o ./src/parser/parser.js --trace ./src/parser/parser.peggy && yarn peg:copy",
+    "start": "node ./run.js",
+    "test": "jest --coverage --detectOpenHandles",
+    "ts": "yarn ts:esm && yarn ts:dts",
+    "ts:dts": "tsc --declaration true --declarationMap true --emitDeclarationOnly true --outDir ./built/dts",
+    "ts:esm": "tsc --outDir ./built/esm",
+    "tsd": "tsd"
+  },
+  "dependencies": {
+    "seedrandom": "^3.0.5",
+    "stringz": "^2.1.0",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@microsoft/api-extractor": "^7.39.1",
+    "@types/jest": "^29.5.11",
+    "@types/node": "^20.10.6",
+    "@types/seedrandom": "^3.0.8",
+    "@types/uuid": "^9.0.7",
+    "@typescript-eslint/eslint-plugin": "^6.17.0",
+    "@typescript-eslint/parser": "^6.17.0",
+    "chalk": "^5.3.0",
+    "copyfiles": "^2.4.1",
+    "eslint": "^8.56.0",
+    "eslint-plugin-import": "^2.29.1",
+    "jest": "^29.7.0",
+    "peggy": "^3.0.2",
+    "ts-jest": "^29.1.1",
+    "ts-jest-resolver": "^2.0.1",
+    "ts-node": "^10.9.2",
+    "tsd": "^0.30.3",
+    "typescript": "^5.3.3"
+  }
+}

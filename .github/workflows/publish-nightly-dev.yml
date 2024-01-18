@@ -1,0 +1,43 @@
+name: Publish nightly (dev)
+
+on:
+  schedule:
+    - cron: '50 18 * * *'
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      BRANCH: develop
+      NPM_SECRET: ${{ secrets.NPM_TOKEN }}
+      TAG: dev
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.1
+        with:
+          ref: ${{ env.BRANCH }}
+      - name: Setup Node.js
+        uses: actions/setup-node@v4.0.0
+        with:
+          cache: yarn
+          node-version: 20.x
+      - name: Install dependencies
+        run: yarn install
+      - name: Build AiScript
+        run: yarn build
+      - name: Update the package version
+        run: |
+          TIME_STAMP=$(date +'%Y%m%d')
+          VERSION_SUFFIX=-$TAG.$TIME_STAMP
+          vim package.json '+/"version"' '+s/:\s*".*\zs\ze"/'$VERSION_SUFFIX/ '+wq'
+      - name: Check commits
+        run: |
+          echo 'LAST_COMMITS='$(git log --since '24 hours ago' | wc -c) >> $GITHUB_ENV
+      - name: Publish the package
+        uses: JS-DevTools/npm-publish@v3
+        if: ${{ env.NPM_SECRET != '' && env.LAST_COMMITS != 0 }}
+        with:
+          access: public
+          tag: ${{ env.TAG }}
+          token: ${{ env.NPM_SECRET }}
